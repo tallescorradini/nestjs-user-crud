@@ -2,16 +2,23 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { UpdateUserDto } from './dtos/update-user-dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   private readonly users: User[] = [];
 
-  create(createUserDto: CreateUserDto) {
-    const user = { id: '1', ...createUserDto };
+  async create(createUserDto: CreateUserDto) {
+    const { password, ...createUserData } = createUserDto;
+
+    //hashing password
+    const saltOrRounds = 10;
+    const hash = await bcrypt.hash(password, saltOrRounds);
+
+    const user = { id: '1', ...createUserData, password: hash };
     this.users.push(user);
 
-    return user;
+    return { id: user.id, ...createUserData };
   }
 
   findOne(id: string): User {
