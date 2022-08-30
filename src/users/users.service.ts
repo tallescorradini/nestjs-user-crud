@@ -3,6 +3,7 @@ import { CreateUserDto } from './dtos/create-user-dto';
 import { UpdateUserDto } from './dtos/update-user-dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,7 @@ export class UsersService {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(password, saltOrRounds);
 
-    const user = { id: '1', ...createUserData, password: hash };
+    const user = { id: uuidv4(), ...createUserData, password: hash };
     this.users.push(user);
 
     return { id: user.id, ...createUserData };
