@@ -7,7 +7,20 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [];
+  private readonly users: User[] = [
+    {
+      id: '5b4b903a-a70d-42b4-aeb9-8421b03231c0',
+      name: 'Test user 1',
+      email: 'test1@test.com',
+      password: '$2b$10$dT59aOcrm/8x.we0Um5Ude8AD1ikDUFZkllBNl47a17k3SUM0MWRm',
+    },
+    {
+      id: 'c02191f0-4b78-40c2-abfd-1a89695080eb',
+      name: 'Test user 2',
+      email: 'test2@test.com',
+      password: '$2b$10$6N/guUU53QcPz5Zjkmxe5e8DIaA9RS27KGaUa/bkwGEWaAER8SrnO',
+    },
+  ];
   private queryUserById(id: string) {
     const user = this.users.filter((user) => user.id === id)[0];
     if (!user) return null;
@@ -51,6 +64,12 @@ export class UsersService {
     this.users.splice(userIndex, 1);
 
     return { id: user.id, name: user.name, email: user.email };
+  }
+  getUserCredentials(email: string): User {
+    const user = this.users.filter((user) => user.email === email)[0] || null;
+
+    if (!user) throw new NotFoundException();
+    return user;
   }
 
   create(createUserDto: CreateUserDto) {
