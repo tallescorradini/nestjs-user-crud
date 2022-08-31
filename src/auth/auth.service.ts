@@ -13,7 +13,7 @@ export class AuthService {
 
     const isValid = await bcrypt.compare(password, encryptedPassword);
 
-    if (!isValid) throw new UnauthorizedException();
+    if (!isValid) return null;
 
     return userData;
   }
