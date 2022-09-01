@@ -45,16 +45,28 @@ export class UsersService {
 
     return { id: user.id, name: user.name, email: user.email };
   }
-  private updateUser(id: string, updateUserDto: UpdateUserDto) {
+  private async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = this.users.filter((user) => user.id === id)[0];
-    const updatedUser = { ...user, ...updateUserDto };
+
+    let updatedUser = { ...user, ...updateUserDto };
+
+    const password = updateUserDto.password;
+    if (password) {
+      const saltOrRounds = 10;
+      const hash = await bcrypt.hash(password, saltOrRounds);
+      updatedUser = { ...updatedUser, password: hash };
+    }
 
     if (!user) throw new NotFoundException();
     const userIndex = this.users.findIndex((user) => user.id === id);
 
     this.users[userIndex] = updatedUser;
 
-    return { id: user.id, name: user.name, email: user.email };
+    return {
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+    };
   }
   private removeUser(id: string) {
     const user = this.users.filter((user) => user.id === id)[0];
@@ -85,7 +97,10 @@ export class UsersService {
     return this.queryUsers();
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): Omit<User, 'password'> {
+  update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     return this.updateUser(id, updateUserDto);
   }
 
